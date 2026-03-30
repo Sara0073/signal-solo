@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroDash — Dyspraxia-First Learning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F7FA;
+    --surface: #FFFFFF;
+    --surface2: #EEF1F6;
+    --calm-blue: #4A90E2;
+    --calm-blue-dk: #2E6DB4;
+    --calm-blue-lt: #D6E9FF;
+    --forest: #2E7D52;
+    --forest-lt: #E1F5EE;
+    --amber: #E09F27;
+    --amber-lt: #FFF3D1;
+    --red-undo: #E24B4A;
+    --text-primary: #1A1D23;
+    --text-secondary: #5A6070;
+    --text-hint: #9099AB;
+    --border: rgba(90,96,112,0.18);
+    --border-md: rgba(90,96,112,0.3);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 18px;
+    --shadow: 0 2px 12px rgba(74,144,226,0.10);
+    --font: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --break-green: #1B5E35;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── SCREEN MANAGEMENT ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--bg);
+  }
+
+  .login-brand {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .login-brand .logo-mark {
+    width: 72px; height: 72px;
+    background: var(--calm-blue);
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 32px;
+  }
+
+  .login-brand h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+  }
+
+  .login-brand p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-top: 0.4rem;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow);
+  }
+
+  .auth-btn {
+    width: 100%;
+    min-height: 64px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: var(--font);
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: transform 0.12s, box-shadow 0.12s;
+    margin-bottom: 1rem;
+  }
+
+  .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,144,226,0.25); }
+  .auth-btn:active { transform: translateY(0) scale(0.98); }
+
+  .auth-btn.primary {
+    background: var(--calm-blue);
+    color: #fff;
+  }
+
+  .auth-btn.secondary {
+    background: var(--surface2);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .auth-divider {
+    text-align: center;
+    color: var(--text-hint);
+    font-size: 0.85rem;
+    margin: 1.25rem 0;
+    position: relative;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: var(--border);
+  }
+  .auth-divider::before { left: 0; }
+  .auth-divider::after { right: 0; }
+
+  .history-hub {
+    background: var(--forest-lt);
+    border: 1px solid rgba(46,125,82,0.25);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .history-hub:hover { transform: translateY(-1px); }
+
+  .history-hub .hub-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--forest);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hist-icon {
+    width: 44px; height: 44px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    border: 1px solid rgba(46,125,82,0.2);
+  }
+
+  .hist-text .task { font-weight: 700; font-size: 0.95rem; }
+  .hist-text .sub { font-size: 0.82rem; color: var(--text-secondary); }
+
+  /* ── MAIN APP LAYOUT ── */
+  #app-screen {
+    flex-direction: column;
+    position: relative;
+  }
+
+  .topbar {
+    height: 60px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+
+  .topbar-brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--calm-blue);
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-brand .dot {
+    width: 28px; height: 28px;
+    background: var(--calm-blue);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .time-display {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: var(--surface2);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .undo-btn {
+    min-width: 48px; min-height: 48px;
+    background: var(--red-undo);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 14px;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .undo-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(226,75,74,0.35); }
+
+  .workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 60px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.25s;
+  }
+
+  .sidebar-section {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Mind map constellation */
+  .constellation {
+    position: relative;
+    height: 200px;
+    background: #F8F9FC;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+  }
+
+  .constellation svg { width: 100%; height: 100%; }
+
+  .node {
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .node:hover circle { r: 14; }
+  .node.active circle { fill: var(--calm-blue) !important; }
+  .node.active text { fill: #fff !important; }
+
+  /* Micro-checklist */
+  .checklist-widget {
+    background: var(--amber-lt);
+    border: 1px solid rgba(224,159,39,0.35);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.1s;
+  }
+  .check-item:hover { background: rgba(224,159,39,0.1); }
+
+  .check-box {
+    width: 22px; height: 22px;
+    border: 2px solid var(--amber);
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-size: 13px;
+  }
+  .check-item.done .check-box { background: var(--amber); color: #fff; }
+  .check-item.done .check-label { text-decoration: line-through; color: var(--text-hint); }
+
+  .check-label { font-size: 0.88rem; font-weight: 400; }
+
+  /* Module nav */
+  .module-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.12s;
+    font-size: 0.9rem;
+  }
+  .module-item:hover { background: var(--surface2); }
+  .module-item.active { background: var(--calm-blue-lt); color: var(--calm-blue-dk); font-weight: 700; }
+  .module-item .mod-icon { font-size: 18px; width: 28px; text-align: center; }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  /* Tabs */
+  .content-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0.75rem 1.25rem 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .tab-btn {
+    padding: 8px 18px;
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    font-weight: 400;
+  }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active { color: var(--calm-blue); border-bottom-color: var(--calm-blue); font-weight: 700; }
+
+  .tab-panel { display: none; flex: 1; overflow: hidden; }
+  .tab-panel.active { display: flex; flex-direction: column; }
+
+  /* ── LECTURE PANEL ── */
+  .lecture-panel {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  .video-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    overflow-y: auto;
+  }
+
+  .video-mock {
+    background: #1A1D23;
+    border-radius: var(--radius);
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+
+  .video-mock .play-btn {
+    width: 64px; height: 64px;
+    background: rgba(74,144,226,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: transform 0.15s;
+  }
+  .video-mock:hover .play-btn { transform: scale(1.1); }
+
+  .video-mock .prog-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+  }
+  .video-mock .prog-fill {
+    height: 100%;
+    background: var(--calm-blue);
+    width: 35%;
+    transition: width 0.3s;
+  }
+
+  /* Bookmark dots on timeline */
+  .timeline-bookmarks {
+    position: absolute;
+    bottom: 4px;
+    left: 0; right: 0;
+    height: 4px;
+    pointer-events: none;
+  }
+
+  .bookmark-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--amber);
+    border-radius: 50%;
+    top: -2px;
+    transform: translateX(-50%);
+  }
+
+  .video-meta h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .video-meta p { font-size: 0.87rem; color: var(--text-secondary); }
+
+  /* Transcript panel */
+  .transcript-panel {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .transcript-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .record-btn {
+    margin-left: auto;
+    width: 32px; height: 32px;
+    background: #FDECEA;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-size: 14px;
+  }
+  .record-btn.recording { background: var(--red-undo); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(226,75,74,0.4)} 50%{box-shadow:0 0 0 8px rgba(226,75,74,0)} }
+
+  .transcript-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+  }
+
+  .transcript-word {
+    display: inline;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 1px 2px;
+    transition: background 0.1s;
+    line-height: 2;
+    font-size: 0.87rem;
+  }
+  .transcript-word:hover { background: var(--calm-blue-lt); color: var(--calm-blue-dk); }
+  .transcript-word.active { background: var(--calm-blue); color: #fff; border-radius: 4px; }
+
+  .voice-note-marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--amber-lt);
+    border: 1px solid rgba(224,159,39,0.4);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #7a5200;
+    margin: 0 4px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
+  /* ── V-IDE PANEL ── */
+  .ide-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    overflow: hidden;
+    gap: 1rem;
+  }
+
+  .ide-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ide-toolbar select, .ide-toolbar button {
+    font-family: var(--font);
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-md);
+    background: var(--surface);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .ide-toolbar button { transition: background 0.12s; }
+  .ide-toolbar button:hover { background: var(--calm-blue-lt); color: var(--calm-blue-dk); }
+
+  .code-editor-wrap {
+    flex: 1;
+    background: #1B1F2E;
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .editor-tabs-bar {
+    display: flex;
+    background: #141720;
+    padding: 0 1rem;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .editor-tab {
+    padding: 8px 16px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.1s;
+  }
+  .editor-tab.active { color: #E0E6FF; border-bottom-color: var(--calm-blue); }
+
+  .code-area {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem 0.5rem;
+    display: flex;
+  }
+
+  .line-nums {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.2);
+    padding-right: 1rem;
+    padding-left: 0.5rem;
+    text-align: right;
+    line-height: 1.75;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .code-content {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    white-space: pre;
+    flex: 1;
+    color: #ABB2BF;
+  }
+  .kw { color: #C678DD; }
+  .type { color: #E5C07B; }
+  .str { color: #98C379; }
+  .cm { color: rgba(255,255,255,0.28); font-style: italic; }
+  .fn { color: #61AFEF; }
+  .num { color: #D19A66; }
+  .ghost { color: rgba(171,178,191,0.3); }
+  .highlight-line { background: rgba(74,144,226,0.12); border-left: 3px solid var(--calm-blue); display: block; margin-left: -3px; padding-left: 3px; }
+
+  .nl-terminal {
+    flex-shrink: 0;
+    background: #141720;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nl-terminal input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    color: #E0E6FF;
+    outline: none;
+  }
+  .nl-terminal input::placeholder { color: rgba(255,255,255,0.3); }
+
+  .nl-send {
+    min-width: 48px; min-height: 36px;
+    background: var(--calm-blue);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+  .nl-send:hover { background: var(--calm-blue-dk); }
+
+  .mic-btn {
+    min-width: 36px; min-height: 36px;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+  .mic-btn:hover { background: rgba(255,255,255,0.15); }
+
+  /* Autocomplete ghost */
+  .autocomplete-hint {
+    background: rgba(74,144,226,0.1);
+    border: 1px solid rgba(74,144,226,0.25);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: rgba(224,230,255,0.5);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 1rem 0.5rem;
+  }
+  .tab-hint {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    flex-shrink: 0;
+  }
+
+  /* ── TESTING PANEL ── */
+  .test-panel {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .test-header-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .count-up-display {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--calm-blue);
+  }
+
+  .extra-time-badge {
+    background: var(--forest-lt);
+    color: var(--forest);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 1px solid rgba(46,125,82,0.25);
+  }
+
+  .test-q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .test-q-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; }
+
+  .response-modes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-md);
+    background: var(--surface);
+    font-family: var(--font);
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    min-height: 48px;
+  }
+  .mode-btn.active { background: var(--calm-blue-lt); border-color: var(--calm-blue); color: var(--calm-blue-dk); font-weight: 700; }
+
+  .code-response {
+    background: #1B1F2E;
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #ABB2BF;
+    min-height: 100px;
+    white-space: pre;
+    outline: none;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .voice-response {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    min-height: 100px;
+  }
+
+  .big-record-btn {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--red-undo);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(226,75,74,0.3);
+  }
+  .big-record-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(226,75,74,0.45); }
+
+  .draw-canvas {
+    width: 100%;
+    height: 160px;
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* ── BREAK OVERLAY ── */
+  #break-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #1B5E35;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 1.5s;
+  }
+  #break-overlay.visible {
+    display: flex;
+    opacity: 1;
+  }
+  #break-overlay.fading {
+    opacity: 0;
+  }
+
+  .break-avatar {
+    width: 90px; height: 90px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    margin-bottom: 1.5rem;
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.06); }
+  }
+
+  .break-msg {
+    color: #fff;
+    text-align: center;
+    max-width: 420px;
+  }
+  .break-msg h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .break-msg p { font-size: 1rem; opacity: 0.85; line-height: 1.7; }
+
+  .break-progress {
+    margin-top: 2rem;
+    width: 280px;
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .break-bar {
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  .break-skip {
+    margin-top: 2rem;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 24px;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .break-skip:hover { background: rgba(255,255,255,0.22); }
+
+  /* ── REVERSE PLANNER ── */
+  .planner-panel {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .deadline-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .deadline-input-row label { font-size: 0.88rem; color: var(--text-secondary); font-weight: 700; }
+  .deadline-input-row input {
+    font-family: var(--font);
+    font-size: 0.9rem;
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    background: var(--surface2);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .deadline-input-row button {
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: var(--calm-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 8px 18px;
+    min-height: 40px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .deadline-input-row button:hover { background: var(--calm-blue-dk); }
+
+  .planner-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .planner-timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 16px;
+    bottom: 16px;
+    width: 2px;
+    background: var(--border);
+    border-radius: 99px;
+  }
+
+  .planner-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 12px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-dot {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+    font-weight: 700;
+    border: 2px solid;
+  }
+
+  .step-now .step-dot { background: var(--calm-blue); border-color: var(--calm-blue); color: #fff; }
+  .step-soon .step-dot { background: var(--surface); border-color: var(--amber); color: var(--amber); }
+  .step-final .step-dot { background: var(--forest-lt); border-color: var(--forest); color: var(--forest); }
+  .step-done .step-dot { background: var(--surface2); border-color: var(--border-md); color: var(--text-hint); }
+
+  .step-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    flex: 1;
+    margin-top: 6px;
+  }
+
+  .step-content .step-time { font-size: 0.75rem; font-weight: 700; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+  .step-content .step-task { font-size: 0.95rem; font-weight: 700; }
+  .step-content .step-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.3rem; }
+  .step-content .step-energy { display: flex; align-items: center; gap: 6px; margin-top: 0.5rem; }
+  .energy-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1A1D23;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    z-index: 10000;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── MISC ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .tag-blue { background: var(--calm-blue-lt); color: var(--calm-blue-dk); }
+  .tag-green { background: var(--forest-lt); color: var(--forest); }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-hint);
+  }
+  .breadcrumb span { color: var(--text-secondary); }
+  .breadcrumb .bc-sep { opacity: 0.4; }
+
+  /* Typo accuracy widget */
+  .accuracy-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .accuracy-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #4A90E2, #2E7D52);
+  }
+
+  /* Mobile friendly */
+  @media (max-width: 900px) {
+    .sidebar { width: 220px; }
+    .transcript-panel { width: 200px; }
+  }
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .transcript-panel { display: none; }
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+
+  /* Focus rings for accessibility */
+  button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid var(--calm-blue);
+    outline-offset: 2px;
+  }
+
+  /* Magnetic button micro interaction */
+  .magnetic {
+    transition: transform 0.15s cubic-bezier(.25,.46,.45,.94);
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────────── LOGIN SCREEN ─────────────── -->
+<div id="login-screen" class="screen active">
+  <div class="login-brand">
+    <div class="logo-mark">🧠</div>
+    <h1>NeuroDash</h1>
+    <p>Your dyspraxia-first learning environment</p>
+  </div>
+
+  <div class="login-card">
+    <button class="auth-btn primary magnetic" onclick="launchApp('biometric')">
+      <span style="font-size:24px">👆</span>
+      Sign in with Touch ID
+    </button>
+    <button class="auth-btn primary magnetic" onclick="launchApp('face')" style="background:#2E7D52;margin-top:-6px">
+      <span style="font-size:24px">😊</span>
+      Sign in with Face ID
+    </button>
+    <div class="auth-divider">or</div>
+    <button class="auth-btn secondary magnetic" onclick="launchApp('magic')">
+      <span style="font-size:20px">✉️</span>
+      Send Magic Link to Email
+    </button>
+
+    <div class="history-hub" onclick="launchApp('history')">
+      <div class="hub-label">📌 Pick Up Where You Left Off</div>
+      <div class="history-item">
+        <div class="hist-icon">🫀</div>
+        <div class="hist-text">
+          <div class="task">Virtual Biopsy — Java Threading</div>
+          <div class="sub">Last active 2 hours ago · Module 4 of 7</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── APP SCREEN ─────────────── -->
+<div id="app-screen" class="screen">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="dot">🧠</div>
+      NeuroDash
+    </div>
+    <div class="breadcrumb">
+      <span>Med-AI</span>
+      <span class="bc-sep">›</span>
+      <span>Virtual Biopsy</span>
+      <span class="bc-sep">›</span>
+      <span style="color:var(--calm-blue)">Java Threading</span>
+    </div>
+    <div class="time-display" id="topbar-timer">⏱ 00:00</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:0.8rem;color:var(--text-hint)">Muscle Memory</span>
+      <div style="width:80px">
+        <div class="accuracy-bar"><div class="accuracy-fill" style="width:78%"></div></div>
+      </div>
+      <span style="font-size:0.8rem;font-weight:700;color:var(--calm-blue)">78%</span>
+    </div>
+    <button class="undo-btn magnetic" onclick="handleUndo()" title="Global Undo — reverts any action">
+      ↩ Undo
+    </button>
+  </div>
+
+  <!-- WORKSPACE -->
+  <div class="workspace">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <!-- Constellation mind-map -->
+      <div class="sidebar-section">
+        <div class="sidebar-label">Module Map</div>
+        <div class="constellation">
+          <svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Connection lines -->
+            <line x1="130" y1="100" x2="65" y2="50" stroke="#CBD5E0" stroke-width="1.5"/>
+            <line x1="130" y1="100" x2="200" y2="55" stroke="#CBD5E0" stroke-width="1.5"/>
+            <line x1="130" y1="100" x2="55" y2="150" stroke="#CBD5E0" stroke-width="1.5"/>
+            <line x1="130" y1="100" x2="205" y2="150" stroke="#CBD5E0" stroke-width="1.5"/>
+            <line x1="130" y1="100" x2="130" y2="165" stroke="#CBD5E0" stroke-width="1.5"/>
+            <!-- Center node -->
+            <g class="node active" onclick="activateNode(this,'threading')">
+              <circle cx="130" cy="100" r="22" fill="#4A90E2"/>
+              <text x="130" y="97" text-anchor="middle" font-size="9" fill="#fff" font-family="Atkinson Hyperlegible,sans-serif">Java</text>
+              <text x="130" y="109" text-anchor="middle" font-size="9" fill="#fff" font-family="Atkinson Hyperlegible,sans-serif">Threading</text>
+            </g>
+            <!-- Satellite nodes -->
+            <g class="node" onclick="activateNode(this,'runnable')">
+              <circle cx="65" cy="50" r="15" fill="#EEF1F6" stroke="#CBD5E0" stroke-width="1"/>
+              <text x="65" y="54" text-anchor="middle" font-size="8" fill="#5A6070" font-family="Atkinson Hyperlegible,sans-serif">Runnable</text>
+            </g>
+            <g class="node" onclick="activateNode(this,'executor')">
+              <circle cx="200" cy="55" r="15" fill="#EEF1F6" stroke="#CBD5E0" stroke-width="1"/>
+              <text x="200" y="59" text-anchor="middle" font-size="8" fill="#5A6070" font-family="Atkinson Hyperlegible,sans-serif">Executor</text>
+            </g>
+            <g class="node" onclick="activateNode(this,'sync')">
+              <circle cx="55" cy="150" r="15" fill="#EEF1F6" stroke="#CBD5E0" stroke-width="1"/>
+              <text x="55" y="154" text-anchor="middle" font-size="8" fill="#5A6070" font-family="Atkinson Hyperlegible,sans-serif">Sync</text>
+            </g>
+            <g class="node" onclick="activateNode(this,'future')">
+              <circle cx="205" cy="150" r="15" fill="#EEF1F6" stroke="#CBD5E0" stroke-width="1"/>
+              <text x="205" y="154" text-anchor="middle" font-size="8" fill="#5A6070" font-family="Atkinson Hyperlegible,sans-serif">Future</text>
+            </g>
+            <g class="node" onclick="activateNode(this,'dicom')">
+              <circle cx="130" cy="168" r="15" fill="#D6E9FF" stroke="#4A90E2" stroke-width="1"/>
+              <text x="130" y="172" text-anchor="middle" font-size="8" fill="#2E6DB4" font-family="Atkinson Hyperlegible,sans-serif">DICOM</text>
+            </g>
+          </svg>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-hint);text-align:center">Tap a topic to navigate</div>
+      </div>
+
+      <!-- Micro-checklist -->
+      <div class="sidebar-section">
+        <div class="sidebar-label">Next 3 Steps</div>
+        <div class="checklist-widget" id="checklist">
+          <div class="check-item done" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <span class="check-label">Open Biopsy.java</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span class="check-label">Define the Thread class</span>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"></div>
+            <span class="check-label">Implement run() method</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module list -->
+      <div class="sidebar-section" style="flex:1">
+        <div class="sidebar-label">Modules</div>
+        <div class="module-item" onclick="switchModule(this)">
+          <span class="mod-icon">📐</span> DICOM Basics
+        </div>
+        <div class="module-item" onclick="switchModule(this)">
+          <span class="mod-icon">🧬</span> 3D Segmentation
+        </div>
+        <div class="module-item active" onclick="switchModule(this)">
+          <span class="mod-icon">☕</span> Java Threading <span class="tag tag-blue" style="margin-left:auto;font-size:0.7rem">Active</span>
+        </div>
+        <div class="module-item" onclick="switchModule(this)">
+          <span class="mod-icon">🔬</span> Virtual Biopsy
+        </div>
+        <div class="module-item" onclick="switchModule(this)">
+          <span class="mod-icon">🧠</span> ML Integration
+        </div>
+      </div>
+
+      <!-- Voice nav hint -->
+      <div style="padding:0.75rem 1rem;border-top:1px solid var(--border);font-size:0.78rem;color:var(--text-hint);display:flex;align-items:center;gap:6px">
+        🎙 Say "Go to Java Module"
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+      <!-- Content tabs -->
+      <div class="content-tabs">
+        <button class="tab-btn active" onclick="switchTab('lecture')">📺 Lecture</button>
+        <button class="tab-btn" onclick="switchTab('code')">💻 V-IDE</button>
+        <button class="tab-btn" onclick="switchTab('test')">📝 Test Mode</button>
+        <button class="tab-btn" onclick="switchTab('planner')">📅 Reverse Planner</button>
+      </div>
+
+      <!-- ── LECTURE TAB ── -->
+      <div class="tab-panel active" id="tab-lecture">
+        <div class="lecture-panel">
+
+          <!-- Video area -->
+          <div class="video-area">
+            <div class="video-mock" onclick="togglePlay(this)">
+              <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0F1923 0%,#1A2535 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+                <div style="color:rgba(255,255,255,0.15);font-family:var(--mono);font-size:0.75rem;position:absolute;top:12px;left:16px">▶ Java Threading · Module 4</div>
+                <div style="position:absolute;top:12px;right:16px;background:rgba(226,75,74,0.85);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:4px">LIVE REC 🔴</div>
+                <!-- Fake video frame visual -->
+                <svg width="180" height="100" viewBox="0 0 180 100">
+                  <rect x="10" y="10" width="160" height="80" rx="4" fill="rgba(74,144,226,0.08)" stroke="rgba(74,144,226,0.2)" stroke-width="1"/>
+                  <text x="90" y="35" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.3)" font-family="monospace">class BiopsyThread</text>
+                  <text x="90" y="52" text-anchor="middle" font-size="10" fill="rgba(74,144,226,0.5)" font-family="monospace">  extends Thread {</text>
+                  <text x="90" y="68" text-anchor="middle" font-size="10" fill="rgba(224,159,39,0.5)" font-family="monospace">  public void run() {</text>
+                </svg>
+              </div>
+              <div class="play-btn" id="play-btn">▶</div>
+              <div class="prog-bar">
+                <div class="prog-fill" id="prog-fill"></div>
+                <div class="timeline-bookmarks">
+                  <div class="bookmark-dot" style="left:22%" title="Voice note"></div>
+                  <div class="bookmark-dot" style="left:48%" title="Voice note"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="video-meta">
+              <h2>Java Threading for DICOM Processing</h2>
+              <p>Understanding concurrent image slice loading · 18:40 remaining</p>
+              <div style="margin-top:0.75rem;display:flex;gap:8px;flex-wrap:wrap">
+                <span class="tag tag-blue">Module 4</span>
+                <span class="tag tag-green">Dyspraxia-Adapted</span>
+                <span class="tag" style="background:var(--amber-lt);color:#7a5200">⏱ 25 min session</span>
+              </div>
+            </div>
+
+            <!-- Audio note sync info -->
+            <div style="margin-top:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.85rem 1rem;font-size:0.84rem;color:var(--text-secondary)">
+              🎙 <strong style="color:var(--text-primary)">2 voice notes</strong> linked to this lecture — click the <span style="background:var(--amber-lt);color:#7a5200;padding:1px 6px;border-radius:4px;font-size:0.78rem;font-weight:700">🎙 notes</span> in the transcript to jump to those moments
+            </div>
+          </div>
+
+          <!-- Transcript panel -->
+          <div class="transcript-panel">
+            <div class="transcript-header">
+              Transcript
+              <button class="record-btn" id="rec-btn" onclick="toggleRecording()" title="Record a voice note at this timestamp">🎙</button>
+            </div>
+            <div class="transcript-scroll" id="transcript">
+              <p style="font-size:0.78rem;color:var(--text-hint);margin-bottom:0.75rem">Click any word to jump to that moment</p>
+              <span class="transcript-word" onclick="jumpTo(this,0)">Welcome</span>
+              <span class="transcript-word" onclick="jumpTo(this,1)">to</span>
+              <span class="transcript-word" onclick="jumpTo(this,2)">our</span>
+              <span class="transcript-word" onclick="jumpTo(this,3)">deep</span>
+              <span class="transcript-word" onclick="jumpTo(this,4)">dive</span>
+              <span class="transcript-word" onclick="jumpTo(this,5)">into</span>
+              <span class="transcript-word" onclick="jumpTo(this,6)">Java</span>
+              <span class="transcript-word" onclick="jumpTo(this,7)">threading.</span>
+              <span class="voice-note-marker">🎙 note</span>
+              <span class="transcript-word" onclick="jumpTo(this,8)">Today</span>
+              <span class="transcript-word" onclick="jumpTo(this,9)">we'll</span>
+              <span class="transcript-word" onclick="jumpTo(this,10)">explore</span>
+              <span class="transcript-word" onclick="jumpTo(this,11)">how</span>
+              <span class="transcript-word" onclick="jumpTo(this,12)">concurrency</span>
+              <span class="transcript-word" onclick="jumpTo(this,13)">enables</span>
+              <span class="transcript-word" onclick="jumpTo(this,14)">real-time</span>
+              <span class="transcript-word" onclick="jumpTo(this,15)">DICOM</span>
+              <span class="transcript-word" onclick="jumpTo(this,16)">slice</span>
+              <span class="transcript-word" onclick="jumpTo(this,17)">loading.</span>
+              <br><br>
+              <span class="transcript-word active" onclick="jumpTo(this,18)">A</span>
+              <span class="transcript-word" onclick="jumpTo(this,19)">Thread</span>
+              <span class="transcript-word" onclick="jumpTo(this,20)">in</span>
+              <span class="transcript-word" onclick="jumpTo(this,21)">Java</span>
+              <span class="transcript-word" onclick="jumpTo(this,22)">represents</span>
+              <span class="transcript-word" onclick="jumpTo(this,23)">an</span>
+              <span class="transcript-word" onclick="jumpTo(this,24)">independent</span>
+              <span class="transcript-word" onclick="jumpTo(this,25)">execution</span>
+              <span class="transcript-word" onclick="jumpTo(this,26)">path.</span>
+              <span class="voice-note-marker">🎙 note</span>
+              <span class="transcript-word" onclick="jumpTo(this,27)">When</span>
+              <span class="transcript-word" onclick="jumpTo(this,28)">loading</span>
+              <span class="transcript-word" onclick="jumpTo(this,29)">a</span>
+              <span class="transcript-word" onclick="jumpTo(this,30)">3D</span>
+              <span class="transcript-word" onclick="jumpTo(this,31)">biopsy</span>
+              <span class="transcript-word" onclick="jumpTo(this,32)">model,</span>
+              <span class="transcript-word" onclick="jumpTo(this,33)">each</span>
+              <span class="transcript-word" onclick="jumpTo(this,34)">CT</span>
+              <span class="transcript-word" onclick="jumpTo(this,35)">slice</span>
+              <span class="transcript-word" onclick="jumpTo(this,36)">can</span>
+              <span class="transcript-word" onclick="jumpTo(this,37)">be</span>
+              <span class="transcript-word" onclick="jumpTo(this,38)">processed</span>
+              <span class="transcript-word" onclick="jumpTo(this,39)">by</span>
+              <span class="transcript-word" onclick="jumpTo(this,40)">a</span>
+              <span class="transcript-word" onclick="jumpTo(this,41)">separate</span>
+              <span class="transcript-word" onclick="jumpTo(this,42)">thread,</span>
+              <span class="transcript-word" onclick="jumpTo(this,43)">dramatically</span>
+              <span class="transcript-word" onclick="jumpTo(this,44)">improving</span>
+              <span class="transcript-word" onclick="jumpTo(this,45)">performance.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── V-IDE TAB ── -->
+      <div class="tab-panel" id="tab-code">
+        <div class="ide-panel">
+
+          <div class="ide-toolbar">
+            <select>
+              <option>Biopsy.java</option>
+              <option>ThreadPool.java</option>
+              <option>DicomLoader.java</option>
+            </select>
+            <button onclick="runCode()">▶ Run</button>
+            <button onclick="formatCode()">⚡ Format</button>
+            <button onclick="showBoilerplate()">🔮 Generate Boilerplate</button>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text-secondary)">
+              <span>🎙</span> Dictate code
+            </div>
+          </div>
+
+          <div class="code-editor-wrap">
+            <div class="editor-tabs-bar">
+              <div class="editor-tab active">Biopsy.java</div>
+              <div class="editor-tab">ThreadPool.java</div>
+              <div class="editor-tab">+ New File</div>
+            </div>
+
+            <div class="code-area">
+              <div class="line-nums" id="line-nums">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</div>
+              <div class="code-content" id="code-display"><span class="cm">// Virtual Biopsy 3D DICOM Processor</span>
+<span class="cm">// Auto-generated boilerplate — add your logic below ↓</span>
+
+<span class="kw">import</span> java.util.concurrent.*;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="type">BiopsyProcessor</span> <span class="kw">implements</span> <span class="type">Runnable</span> {
+
+    <span class="kw">private final</span> <span class="type">List</span>&lt;<span class="type">DicomSlice</span>&gt; slices;
+    <span class="kw">private final</span> <span class="type">ExecutorService</span> pool;
+
+    <span class="kw">public</span> <span class="fn">BiopsyProcessor</span>(<span class="type">List</span>&lt;<span class="type">DicomSlice</span>&gt; slices) {
+        <span class="kw">this</span>.slices = slices;
+        <span class="kw">this</span>.pool = <span class="type">Executors</span>.<span class="fn">newFixedThreadPool</span>(<span class="num">4</span>);
+    }
+
+<span class="highlight-line">    <span class="cm">// ← ADD YOUR LOGIC HERE</span>
+    @<span class="type">Override</span>
+    <span class="kw">public void</span> <span class="fn">run</span>() {
+        <span class="cm">// Process each DICOM slice concurrently</span>
+        <span class="kw">for</span> (<span class="type">DicomSlice</span> slice : slices) {
+            pool.<span class="fn">submit</span>(() -&gt; <span class="fn">processSlice</span>(slice));
+        }
+    }
+<span class="ghost">    // smart suggestion: void processSlice(DicomSlice s) { ... }</span></div>
+            </div>
+
+            <div class="autocomplete-hint" id="autocomplete-hint">
+              <span style="color:rgba(224,230,255,0.4);font-size:0.78rem">Suggestion:</span>
+              <span>void processSlice(DicomSlice s) { s.load(); s.segment(); }</span>
+              <span class="tab-hint">Tab ↹</span>
+            </div>
+
+            <div class="nl-terminal">
+              <span style="color:rgba(255,255,255,0.25);font-size:1rem">$</span>
+              <input type="text" id="nl-input" placeholder="What do you want to build? (e.g. 'Add error handling to the thread pool')"
+                     onkeydown="if(event.key==='Enter')sendNL()">
+              <button class="mic-btn" title="Speak your command">🎙</button>
+              <button class="nl-send" onclick="sendNL()" title="Send">↵</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── TEST TAB ── -->
+      <div class="tab-panel" id="tab-test">
+        <div class="test-panel">
+
+          <div class="test-header-card">
+            <div>
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-hint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Time Used</div>
+              <div class="count-up-display" id="test-timer">00:00</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px">Progress: <strong style="color:var(--text-primary)">Question 2 of 5</strong></div>
+              <div style="height:8px;background:var(--surface2);border-radius:99px;overflow:hidden">
+                <div style="height:100%;width:40%;background:var(--calm-blue);border-radius:99px;transition:width 0.3s"></div>
+              </div>
+            </div>
+            <div>
+              <div class="extra-time-badge">✓ +25% Buffer Active</div>
+              <div style="font-size:0.75rem;color:var(--text-hint);margin-top:6px;text-align:center">Hidden buffer applied</div>
+            </div>
+          </div>
+
+          <div class="test-q-card">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--text-hint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem">Question 2</div>
+            <h3>Implement a Java method that processes a list of DicomSlice objects concurrently using an ExecutorService. Explain your thread management strategy.</h3>
+
+            <div class="response-modes">
+              <button class="mode-btn active" onclick="setMode(this,'code')">💻 Code</button>
+              <button class="mode-btn" onclick="setMode(this,'voice')">🎙 Voice Recording</button>
+              <button class="mode-btn" onclick="setMode(this,'draw')">✏️ Draw Diagram</button>
+            </div>
+
+            <div id="response-code">
+              <div class="code-response" contenteditable="true" id="test-code-area">// Write your answer here...
+public void processSlices(List&lt;DicomSlice&gt; slices) {
+    
+}</div>
+            </div>
+
+            <div id="response-voice" style="display:none">
+              <div class="voice-response">
+                <div class="big-record-btn" onclick="toggleTestRecord(this)">🎙</div>
+                <div style="font-size:0.9rem;color:var(--text-secondary)" id="voice-status">Tap to start recording your answer</div>
+              </div>
+            </div>
+
+            <div id="response-draw" style="display:none">
+              <canvas class="draw-canvas" id="draw-canvas"></canvas>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button onclick="clearCanvas()" style="font-family:var(--font);font-size:0.85rem;padding:6px 14px;border:1px solid var(--border-md);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer">Clear</button>
+                <div style="display:flex;gap:4px;align-items:center">
+                  <div onclick="setPen('#1A1D23')" style="width:22px;height:22px;border-radius:50%;background:#1A1D23;cursor:pointer;border:2px solid var(--border-md)"></div>
+                  <div onclick="setPen('#4A90E2')" style="width:22px;height:22px;border-radius:50%;background:#4A90E2;cursor:pointer"></div>
+                  <div onclick="setPen('#E24B4A')" style="width:22px;height:22px;border-radius:50%;background:#E24B4A;cursor:pointer"></div>
+                  <div onclick="setPen('#2E7D52')" style="width:22px;height:22px;border-radius:50%;background:#2E7D52;cursor:pointer"></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:1.25rem;display:flex;gap:10px;justify-content:flex-end">
+              <button onclick="showToast('Answer saved as draft')" style="font-family:var(--font);padding:10px 20px;border:1px solid var(--border-md);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;font-size:0.9rem;min-height:48px">Save Draft</button>
+              <button onclick="showToast('Submitted! Moving to Q3...')" style="font-family:var(--font);padding:10px 24px;border:none;border-radius:var(--radius-sm);background:var(--calm-blue);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:700;min-height:48px;transition:background 0.12s" onmouseover="this.style.background='#2E6DB4'" onmouseout="this.style.background='#4A90E2'">Submit Answer →</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── PLANNER TAB ── -->
+      <div class="tab-panel" id="tab-planner">
+        <div class="planner-panel">
+
+          <div class="deadline-input-row">
+            <label>Deadline:</label>
+            <input type="datetime-local" id="deadline-input">
+            <button onclick="generatePlan()">Generate Reverse Plan</button>
+          </div>
+
+          <div id="planner-timeline" class="planner-timeline">
+            <!-- Steps injected by JS -->
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- end main-content -->
+  </div><!-- end workspace -->
+</div><!-- end app-screen -->
+
+<!-- ─────────────── BREAK OVERLAY ─────────────── -->
+<div id="break-overlay">
+  <div class="break-avatar">🌿</div>
+  <div class="break-msg">
+    <h2>Time for a Proprioceptive Reset</h2>
+    <p>Push your palms together firmly for 10 seconds. Feel the weight of the chair beneath you. Breathe slowly. You are grounded. 🌱</p>
+  </div>
+  <div class="break-progress">
+    <div class="break-bar" id="break-bar"></div>
+  </div>
+  <div style="color:rgba(255,255,255,0.65);font-size:0.85rem;margin-top:1rem" id="break-countdown">2:00 remaining</div>
+  <button class="break-skip" onclick="endBreak()">Skip break (not recommended)</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── STATE ───
+let isPlaying = false;
+let sessionSeconds = 0;
+let testSeconds = 0;
+let breakActive = false;
+let isRecording = false;
+let penColor = '#1A1D23';
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let undoHistory = [];
+
+// ─── INIT ───
+window.onload = () => {
+  // Set default deadline to Thursday
+  const d = new Date(); d.setDate(d.getDate() + (4 - d.getDay() + 7) % 7 || 7);
+  d.setHours(23, 59);
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('deadline-input').value =
+    `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+  generatePlan();
+  initCanvas();
+
+  // Session timer
+  setInterval(() => {
+    sessionSeconds++;
+    const m = String(Math.floor(sessionSeconds/60)).padStart(2,'0');
+    const s = String(sessionSeconds%60).padStart(2,'0');
+    document.getElementById('topbar-timer').textContent = `⏱ ${m}:${s}`;
+    // At 25 min → break
+    if(sessionSeconds === 25*60 && !breakActive) triggerBreak();
+  }, 1000);
+
+  // Test timer
+  setInterval(() => {
+    testSeconds++;
+    const m = String(Math.floor(testSeconds/60)).padStart(2,'0');
+    const s = String(testSeconds%60).padStart(2,'0');
+    document.getElementById('test-timer').textContent = `${m}:${s}`;
+  }, 1000);
+
+  // Magnetic effect on buttons
+  document.querySelectorAll('.magnetic').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      const dx = e.clientX - cx, dy = e.clientY - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < 60) { btn.style.transform = `translate(${dx*0.18}px,${dy*0.18}px)`; }
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+};
+
+// ─── LOGIN ───
+function launchApp(method) {
+  const msgs = {
+    biometric: '✓ Touch ID verified — Welcome back!',
+    face: '✓ Face ID verified — Welcome back!',
+    magic: '✉️ Magic link sent to your email',
+    history: '↩ Resuming Virtual Biopsy — Java Threading'
+  };
+  showToast(msgs[method] || 'Logging in...');
+  setTimeout(() => {
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('app-screen').classList.add('active');
+  }, method === 'magic' ? 1200 : 600);
+}
+
+// ─── TABS ───
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(name));
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'tab-' + name);
+  });
+}
+
+// ─── VIDEO ───
+function togglePlay(el) {
+  isPlaying = !isPlaying;
+  document.getElementById('play-btn').textContent = isPlaying ? '⏸' : '▶';
+  if(isPlaying) {
+    let prog = 35;
+    const iv = setInterval(() => {
+      if(!isPlaying || prog >= 100) { clearInterval(iv); return; }
+      prog += 0.05;
+      document.getElementById('prog-fill').style.width = prog + '%';
+    }, 100);
+  }
+}
+
+function jumpTo(el, idx) {
+  document.querySelectorAll('.transcript-word').forEach(w => w.classList.remove('active'));
+  el.classList.add('active');
+  const pct = Math.min((idx / 45) * 100, 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  showToast(`Jumped to ${Math.floor(pct/100*18*60/60)}:${String(Math.floor(pct/100*18*60%60)).padStart(2,'0')}`);
+}
+
+// ─── RECORDING ───
+function toggleRecording() {
+  isRecording = !isRecording;
+  const btn = document.getElementById('rec-btn');
+  btn.classList.toggle('recording', isRecording);
+  btn.textContent = isRecording ? '⏹' : '🎙';
+  if(!isRecording) showToast('🎙 Voice note saved at current timestamp');
+}
+
+// ─── CHECKLIST ───
+function toggleCheck(el) {
+  el.classList.toggle('done');
+  const allDone = [...document.querySelectorAll('.check-item')].every(i => i.classList.contains('done'));
+  if(allDone) showToast('✅ All steps complete! Great work.');
+}
+
+// ─── SIDEBAR ───
+function activateNode(el, name) {
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  showToast(`Navigating to: ${name}`);
+}
+
+function switchModule(el) {
+  document.querySelectorAll('.module-item').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── IDE ───
+function runCode() { showToast('▶ Running BiopsyProcessor.java... ✓ No errors'); }
+function formatCode() { showToast('⚡ Code formatted with Google Java Style'); }
+
+function showBoilerplate() {
+  const nl = document.getElementById('nl-input');
+  nl.value = 'Create a boilerplate for a 3D DICOM processor';
+  showToast('🔮 Boilerplate generated — see highlighted line for your entry point');
+}
+
+function sendNL() {
+  const input = document.getElementById('nl-input');
+  const val = input.value.trim();
+  if(!val) return;
+  showToast('🤖 Generating code... ✓ Inserted at line 25');
+  undoHistory.push({ type: 'nl', value: val });
+  input.value = '';
+}
+
+// ─── TEST MODE ───
+function setMode(btn, mode) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('response-code').style.display = mode === 'code' ? 'block' : 'none';
+  document.getElementById('response-voice').style.display = mode === 'voice' ? 'block' : 'none';
+  document.getElementById('response-draw').style.display = mode === 'draw' ? 'block' : 'none';
+}
+
+function toggleTestRecord(btn) {
+  const status = document.getElementById('voice-status');
+  if(btn.textContent === '🎙') {
+    btn.textContent = '⏹';
+    btn.style.background = '#666';
+    status.textContent = '🔴 Recording... speak your answer';
+    btn.style.animation = 'pulse 1s infinite';
+  } else {
+    btn.textContent = '🎙';
+    btn.style.background = 'var(--red-undo)';
+    btn.style.animation = '';
+    status.textContent = '✓ Recording saved (0:12)';
+  }
+}
+
+// ─── CANVAS ───
+function initCanvas() {
+  const canvas = document.getElementById('draw-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return [src.clientX - r.left, src.clientY - r.top];
+  };
+
+  canvas.addEventListener('mousedown', e => { isDrawing = true; [lastX, lastY] = getPos(e); });
+  canvas.addEventListener('mousemove', e => {
+    if(!isDrawing) return;
+    const [x, y] = getPos(e);
+    ctx.strokeStyle = penColor;
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    [lastX, lastY] = [x, y];
+  });
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; [lastX, lastY] = getPos(e); });
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if(!isDrawing) return;
+    const [x, y] = getPos(e);
+    ctx.strokeStyle = penColor;
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    [lastX, lastY] = [x, y];
+  });
+  canvas.addEventListener('touchend', () => isDrawing = false);
+}
+
+function clearCanvas() {
+  const canvas = document.getElementById('draw-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function setPen(color) { penColor = color; }
+
+// ─── PLANNER ───
+function generatePlan() {
+  const deadlineInput = document.getElementById('deadline-input').value;
+  const deadline = deadlineInput ? new Date(deadlineInput) : new Date(Date.now() + 3 * 24*60*60*1000);
+  const now = new Date();
+  const hoursLeft = Math.round((deadline - now) / 3600000);
+
+  const steps = [
+    { type: 'step-final', dot: '🏁', time: `${deadline.toLocaleDateString('en',{weekday:'long'})} ${deadline.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'})}`, task: 'Submit Virtual Biopsy Project', desc: 'Final deliverable — all modules complete', energy: [1,1,1,1,1], energyLabel: 'High achievement!' },
+    { type: 'step-soon', dot: '🧪', time: `${Math.round(hoursLeft*0.25)}h before deadline`, task: 'Run final tests & review output', desc: 'Check thread safety and output accuracy', energy: [1,1,1,0,0], energyLabel: 'Moderate energy' },
+    { type: 'step-soon', dot: '💻', time: `${Math.round(hoursLeft*0.5)}h before deadline`, task: 'Complete processSlice() logic', desc: 'Your coding focus zone — use V-IDE', energy: [1,1,1,1,0], energyLabel: 'High energy needed' },
+    { type: 'step-done', dot: '📺', time: `${Math.round(hoursLeft*0.75)}h before deadline`, task: 'Finish watching Module 4', desc: 'Threading lecture — 35% already done!', energy: [1,1,0,0,0], energyLabel: 'Low energy OK' },
+    { type: 'step-now', dot: '▶', time: 'RIGHT NOW', task: 'Continue from where you left off', desc: 'Java threading lecture · V-IDE open', energy: [1,0,0,0,0], energyLabel: 'Start easy' },
+  ];
+
+  const colors = { 'step-now': '#4A90E2', 'step-soon': '#E09F27', 'step-final': '#2E7D52', 'step-done': '#9099AB' };
+
+  document.getElementById('planner-timeline').innerHTML = steps.map((s,i) => `
+    <div class="planner-step">
+      <div class="step-dot ${s.type}" style="font-size:${i===4?'18px':'22px'}">${s.dot}</div>
+      <div class="step-content">
+        <div class="step-time">${s.time}</div>
+        <div class="step-task">${s.task}</div>
+        <div class="step-desc">${s.desc}</div>
+        <div class="step-energy">
+          ${s.energy.map(e => `<div class="energy-dot" style="background:${e ? colors[s.type] : 'var(--surface2)'}"></div>`).join('')}
+          <span style="font-size:0.75rem;color:var(--text-hint);margin-left:4px">${s.energyLabel}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── BREAK ───
+function triggerBreak() {
+  breakActive = true;
+  const overlay = document.getElementById('break-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => overlay.classList.add('visible'), 50);
+
+  let remaining = 120;
+  const bar = document.getElementById('break-bar');
+  const cd = document.getElementById('break-countdown');
+
+  const iv = setInterval(() => {
+    remaining--;
+    bar.style.width = ((120 - remaining) / 120 * 100) + '%';
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    cd.textContent = `${m}:${String(s).padStart(2,'0')} remaining`;
+    if(remaining <= 0) { clearInterval(iv); endBreak(); }
+  }, 1000);
+}
+
+function endBreak() {
+  const overlay = document.getElementById('break-overlay');
+  overlay.classList.add('fading');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.classList.remove('visible', 'fading');
+    breakActive = false;
+  }, 1500);
+  showToast('🌿 Break complete — keyboard unlocked. Ready to focus!');
+}
+
+// ─── UNDO ───
+function handleUndo() {
+  if(undoHistory.length > 0) {
+    undoHistory.pop();
+    showToast('↩ Action undone');
+  } else {
+    showToast('↩ Nothing to undo');
+  }
+}
+
+// ─── TOAST ───
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Demo break after 8 seconds if user wants to test (hidden — only triggers at 25min in real use)
+// For demo: hold Shift+B to trigger break
+document.addEventListener('keydown', e => {
+  if(e.shiftKey && e.key === 'B') triggerBreak();
+  if(e.key === 'Tab' && document.getElementById('tab-code').classList.contains('active')) {
+    e.preventDefault();
+    document.getElementById('autocomplete-hint').style.display = 'none';
+    showToast('✓ Suggestion accepted via Tab');
+  }
+});
+</script>
+</body>
+</html>
